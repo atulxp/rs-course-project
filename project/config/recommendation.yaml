@@ -1,0 +1,165 @@
+# =============================================================================
+# RE-RecSys-Inspired Recommendation System — Central Configuration
+# =============================================================================
+# All "tunable" numbers used anywhere in the pipeline live here so that every
+# weight / threshold / bin is documented, traceable, and reproducible instead
+# of being hard-coded inside python modules.
+#
+# Where a value is taken (or adapted) from the RE-RecSys paper
+# (Venkatesh et al., CODS-COMAD 2024), it is noted in a comment. Values with
+# no paper equivalent (because our environment is a public listings dataset
+# with SIMULATED interactions, not Housing.com's proprietary clickstream) are
+# marked "adapted for this project".
+# =============================================================================
+
+seed: 42
+
+# -----------------------------------------------------------------------------
+# Interaction types and their weights.
+# Paper reference: Table 1 of RE-RecSys assigns weights 1/2/4/6/8/10 to
+# "Other" / "Impressions" / "Detail Page" / and 3 "Conversion" sub-actions,
+# derived from each action's empirical conversion rate to a submitted lead
+# (CRF). We do not have Housing.com's conversion-rate table, so we collapse
+# their 6 action types into 7 interaction types that map onto a public
+# listings site, and preserve the same *relative* weight ordering / shape
+# (low-intent browsing < detail engagement < shortlist-style intent <
+# lead/contact < conversion).
+# -----------------------------------------------------------------------------
+interaction_weights:
+  impression: 1        # property appeared in a results list / was scrolled past
+  image_view: 2         # user opened the image gallery
+  detail_view: 4        # user opened the property detail page (PDP)
+  amenity_view: 3        # user expanded amenities / floor plan / locality info
+  shortlist: 6           # user favorited / shortlisted the property
+  lead: 8                 # user submitted a contact / enquiry (CRF-equivalent)
+  conversion: 10           # user completed the simulated "deal" (highest intent)
+
+# Alternative weighting schemes implemented for the Table-3-style ablation
+# study (paper compares linear / exponential-decay / TF-IDF weighting for the
+# collaborative model). All three are implemented in
+# src/interactions/weighting.py and compared in the evaluation.
+weighting_schemes:
+  linear:
+    description: "Interaction weight = interaction_weights[type] (paper's chosen scheme)"
+  exponential_decay:
+    half_life_days: 3          # paper: "half-life exponential decay ... at regular intervals of 3 days"
+  tfidf:
+    description: "weight = interaction_weights[type] * log(total_interactions / interactions_on_property)"
+
+# -----------------------------------------------------------------------------
+# User category thresholds.
+# Paper reference: cold-start = 0 historical data; short-term = last 10
+# minutes of interaction; long-term = >10 minutes of history AND >=5
+# properties interacted with; short-long-term = both recent + historical.
+# We do not have real wall-clock browsing sessions (interactions are
+# simulated instantaneously per synthetic user), so "recency" is modeled as
+# an explicit `is_recent` flag on each simulated interaction rather than a
+# true timestamp window, and thresholds are expressed in interaction COUNTS
+# instead of minutes. This is an explicit, documented adaptation.
+# -----------------------------------------------------------------------------
+user_category_thresholds:
+  cold_start:
+    max_total_interactions: 0
+  short_term:
+    min_recent_interactions: 1     # has *some* recent activity
+    max_total_interactions: 4      # but not enough total history to be long-term
+  long_term:
+    min_total_interactions: 5      # paper: "interacted with at-least 5 properties"
+  short_long_term:
+    min_total_interactions: 5
+    min_recent_interactions: 1
+
+# -----------------------------------------------------------------------------
+# Rule-based cold-start engine (paper section 2.0.1).
+# Paper: cohorts = locality x apartment_type x profile_type x price/sqft bins
+# (gap of 500K/10K INR for purchase/rent) x area bins (gap of 500 sqft).
+# We do not have a "profile_type" (broker/owner) field with usable coverage
+# in this public dataset, so cohorts are built on
+# locality x property_type x bhk x price_per_sqft_bin x area_bin.
+# -----------------------------------------------------------------------------
+rule_based:
+  cohort_keys: [city, locality, property_type, bhk, transaction_type]
+  price_per_sqft_bin_gap:
+    buy: 500000     # paper value for purchase, re-used since price/sqft in INR
+    rent: 10000     # paper value for rent
+  area_bin_sqft_gap: 500
+  scoring_weights:            # documented, configurable weights (Section 11 of prompt)
+    budget_match: 0.30
+    location_match: 0.25
+    bhk_match: 0.20
+    property_type_match: 0.10
+    furnishing_match: 0.05
+    amenities_match: 0.10
+  top_n_per_cohort: 2         # paper: "return the randomly chosen top 2 properties from each cohort"
+
+# -----------------------------------------------------------------------------
+# Content-based feature binning (paper section 2.0.2).
+# Paper bins: area (500 sqft), age (3 yr), floor number (2 floors), image
+# count (3 images); price bins of 500k/10k (purchase/rent). Our public
+# dataset lacks a per-listing image count, so that bin is omitted and
+# replaced with nothing invented; everything else follows the paper's bin
+# widths, adapted to our data's actual scale (verified against EDA in
+# docs/data_dictionary.md).
+# -----------------------------------------------------------------------------
+content_features:
+  price_bin_gap:
+    buy: 500000
+    rent: 10000
+  area_bin_sqft: 500
+  age_bin_years: 3
+  floor_bin: 2
+  tfidf_max_features: 300
+  tfidf_min_df: 5
+
+# -----------------------------------------------------------------------------
+# Collaborative filtering (ALS) hyperparameters — Section 13.
+# -----------------------------------------------------------------------------
+collaborative:
+  factors: 32
+  regularization: 0.05
+  iterations: 20
+  alpha: 15          # confidence scaling for implicit ALS
+  random_state: 42
+
+# -----------------------------------------------------------------------------
+# Hybrid recommender (Section 14).
+# -----------------------------------------------------------------------------
+hybrid:
+  default_alpha: 0.5     # final_score = alpha*content + (1-alpha)*collaborative
+  alpha_grid: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+
+# -----------------------------------------------------------------------------
+# Synthetic user / interaction generation.
+# -----------------------------------------------------------------------------
+synthetic:
+  num_users: 1200
+  archetype_split:
+    buyer: 0.5
+    renter: 0.5
+  interactions_per_user:
+    cold_start: 0
+    short_term: [1, 4]
+    long_term: [5, 40]
+    short_long_term: [5, 40]
+  category_split:            # paper's approximate real-world proportions (Section 2), reused
+    cold_start: 0.25          # paper: ~25% cold-start
+    short_term: 0.20          # paper: ~20% short-term
+    long_term: 0.35           # paper: ~35% long-term
+    short_long_term: 0.20     # paper: ~20% short-long-term
+  match_score_noise_std: 0.15   # noise added to preference-match probability when sampling interactions
+  negative_sample_ratio: 0.3    # fraction of interactions on non-matching (exploration) properties
+
+# -----------------------------------------------------------------------------
+# Evaluation.
+# -----------------------------------------------------------------------------
+evaluation:
+  k_values: [5, 10, 20]
+  paper_k: 6              # paper reports MAP@6 / NDCG@6 — reproduced for direct structural comparison
+  test_fraction_per_user: 0.3   # fraction of each user's interactions held out for testing
+  min_interactions_for_eval: 2  # a user needs >=2 interactions to have a train/test split
+
+# -----------------------------------------------------------------------------
+# Misc / performance
+# -----------------------------------------------------------------------------
+top_k_default: 10
+max_top_k: 50

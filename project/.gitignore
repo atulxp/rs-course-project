@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Generated data / model artifacts (reproducible via `python scripts/train.py`)
+data/processed/*.csv
+models/content/*
+models/collaborative/*
+results/metrics/*
+results/tables/*
+results/plots/*
+!models/content/.gitkeep
+!models/collaborative/.gitkeep
+!results/metrics/.gitkeep
+!results/tables/.gitkeep
+!results/plots/.gitkeep
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Env
+.env
