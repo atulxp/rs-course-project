@@ -1,0 +1,194 @@
+{
+  "n_properties": 38482,
+  "n_users": 1200,
+  "n_interactions": 15559,
+  "n_train_interactions": 10888,
+  "n_test_interactions": 4671,
+  "model_comparison_at_k10": {
+    "rule_based": {
+      "n_users_evaluated": 150,
+      "precision@5": 0.016,
+      "recall@5": 0.0108,
+      "map@5": 0.0107,
+      "ndcg@5": 0.0199,
+      "hit_rate@5": 0.0733,
+      "precision@10": 0.0127,
+      "recall@10": 0.0177,
+      "map@10": 0.0085,
+      "ndcg@10": 0.0199,
+      "hit_rate@10": 0.1133,
+      "precision@20": 0.013,
+      "recall@20": 0.0336,
+      "map@20": 0.0099,
+      "ndcg@20": 0.0278,
+      "hit_rate@20": 0.1933
+    },
+    "content_based": {
+      "n_users_evaluated": 150,
+      "precision@5": 0.0093,
+      "recall@5": 0.0058,
+      "map@5": 0.006,
+      "ndcg@5": 0.0112,
+      "hit_rate@5": 0.04,
+      "precision@10": 0.0093,
+      "recall@10": 0.0135,
+      "map@10": 0.0048,
+      "ndcg@10": 0.0126,
+      "hit_rate@10": 0.0733,
+      "precision@20": 0.0057,
+      "recall@20": 0.0154,
+      "map@20": 0.005,
+      "ndcg@20": 0.0136,
+      "hit_rate@20": 0.0867
+    },
+    "collaborative": {
+      "n_users_evaluated": 150,
+      "precision@5": 0.004,
+      "recall@5": 0.0027,
+      "map@5": 0.0009,
+      "ndcg@5": 0.0027,
+      "hit_rate@5": 0.02,
+      "precision@10": 0.0027,
+      "recall@10": 0.0038,
+      "map@10": 0.0007,
+      "ndcg@10": 0.0028,
+      "hit_rate@10": 0.0267,
+      "precision@20": 0.0033,
+      "recall@20": 0.0092,
+      "map@20": 0.0012,
+      "ndcg@20": 0.0054,
+      "hit_rate@20": 0.06
+    },
+    "hybrid": {
+      "n_users_evaluated": 150,
+      "precision@5": 0.0053,
+      "recall@5": 0.0038,
+      "map@5": 0.0031,
+      "ndcg@5": 0.0062,
+      "hit_rate@5": 0.0267,
+      "precision@10": 0.0053,
+      "recall@10": 0.0072,
+      "map@10": 0.0027,
+      "ndcg@10": 0.0072,
+      "hit_rate@10": 0.0467,
+      "precision@20": 0.0057,
+      "recall@20": 0.018,
+      "map@20": 0.0036,
+      "ndcg@20": 0.0118,
+      "hit_rate@20": 0.0933
+    }
+  },
+  "best_hybrid_alpha_by_ndcg": 0.9,
+  "category_performance": {
+    "cold_start": {
+      "precision@6": 0.0,
+      "recall@6": 0.0,
+      "map@6": 0.0,
+      "ndcg@6": 0.0,
+      "hit_rate@6": 0.0,
+      "n_users": 10
+    },
+    "long_term": {
+      "precision@6": 0.0058,
+      "recall@6": 0.0038,
+      "map@6": 0.0033,
+      "ndcg@6": 0.0071,
+      "hit_rate@6": 0.0347,
+      "n_users": 144
+    },
+    "short_term": {
+      "precision@6": 0.0,
+      "recall@6": 0.0,
+      "map@6": 0.0,
+      "ndcg@6": 0.0,
+      "hit_rate@6": 0.0,
+      "n_users": 46
+    }
+  },
+  "city_performance": {
+    "Gurgaon": {
+      "precision@6": 0.0052,
+      "recall@6": 0.0038,
+      "map@6": 0.0035,
+      "ndcg@6": 0.0071,
+      "hit_rate@6": 0.0312,
+      "n_users": 64
+    },
+    "Hyderabad": {
+      "precision@6": 0.0033,
+      "recall@6": 0.0016,
+      "map@6": 0.0005,
+      "ndcg@6": 0.0021,
+      "hit_rate@6": 0.0196,
+      "n_users": 51
+    },
+    "Kolkata": {
+      "precision@6": 0.0049,
+      "recall@6": 0.0037,
+      "map@6": 0.0049,
+      "ndcg@6": 0.0089,
+      "hit_rate@6": 0.0294,
+      "n_users": 34
+    },
+    "Mumbai": {
+      "precision@6": 0.0033,
+      "recall@6": 0.0018,
+      "map@6": 0.0011,
+      "ndcg@6": 0.003,
+      "hit_rate@6": 0.0196,
+      "n_users": 51
+    }
+  },
+  "weighting_scheme_ablation": {
+    "linear": {
+      "precision@6": 0.0033,
+      "recall@6": 0.0027,
+      "map@6": 0.0007,
+      "ndcg@6": 0.0024,
+      "hit_rate@6": 0.02,
+      "n_users": 150
+    },
+    "exponential_decay": {
+      "precision@6": 0.0033,
+      "recall@6": 0.002,
+      "map@6": 0.0024,
+      "ndcg@6": 0.0048,
+      "hit_rate@6": 0.02,
+      "n_users": 150
+    },
+    "tfidf": {
+      "precision@6": 0.0056,
+      "recall@6": 0.0045,
+      "map@6": 0.002,
+      "ndcg@6": 0.0052,
+      "hit_rate@6": 0.0333,
+      "n_users": 150
+    }
+  },
+  "latency_ms": {
+    "collaborative": {
+      "mean_ms": 0.205,
+      "median_ms": 0.209,
+      "p95_ms": 0.224,
+      "n_calls": 79
+    },
+    "content_based": {
+      "mean_ms": 18.309,
+      "median_ms": 23.8,
+      "p95_ms": 35.549,
+      "n_calls": 79
+    },
+    "hybrid": {
+      "mean_ms": 13.516,
+      "median_ms": 16.776,
+      "p95_ms": 25.463,
+      "n_calls": 79
+    },
+    "rule_based": {
+      "mean_ms": 13.803,
+      "median_ms": 14.908,
+      "p95_ms": 16.874,
+      "n_calls": 100
+    }
+  }
+}
