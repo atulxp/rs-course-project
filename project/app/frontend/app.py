@@ -105,7 +105,7 @@ def _simulate(property_id: str, interaction_type: str):
 
 
 def page_activity(orch):
-    st.title("🧾 My Activity")
+    st.title("My Activity")
     uid = st.session_state.selected_user_id
     if uid is None:
         st.info("Select a user on the Recommendations page to view their activity.")
